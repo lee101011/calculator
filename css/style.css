@@ -10,7 +10,7 @@
   justify-content: center;
   align-items: center;
   height:60%;
-  margin-top: 10%;
+  margin-top: 5%;
 }
 
 .display {
@@ -19,8 +19,23 @@
   border-style: solid;
   border-color: black;
   width: 500px;
-  height: 100px;
+  min-height: 170px;
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  flex-wrap: nowrap;
+  flex: 1;
 }
+
+.history {
+  font-size: 30px;
+}
+
+.result {
+  font-size: 50px;
+}
+
 .buttons {
   border: 1px solid black;
 

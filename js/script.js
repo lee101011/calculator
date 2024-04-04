@@ -76,9 +76,8 @@ function prepareOperations(array) {
   return operations;
 }
 
-let display = "";
+let displayValue = "";
 let lastEntry;
-let history;
 let numberStack = [];
 let operatorStack = [];
 const OPERATOR = 1;
@@ -110,6 +109,8 @@ function queueOperator(operator, number) {
 function calculate() {
 }
 
+const history = document.querySelector(".history");
+const result = document.querySelector(".result");
 const grid = document.querySelector(".buttons");
 grid.addEventListener("click", handleButtons);
 
@@ -121,17 +122,27 @@ function handleButtons(e) {
     case "three":
     case "four":
     case "five":
-    case "siz":
+    case "six":
     case "seven":
     case "eight":
     case "nine":
     case "zero":
       numberPress(e.target.textContent);
       break;
-    
+    case "decimal":
+      handleDecimal();
+      break;
   }
 }
 
 function numberPress(string) {
-  console.log(string);
+  history.textContent = history.textContent + string;
+  result.textContent = result.textContent + string;
+}
+
+function handleDecimal(){
+  if(!result.textContent.includes(".")) {
+    result.textContent = result.textContent + ".";
+    history.textContent = history.textContent + ".";
+  }
 }
