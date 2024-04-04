@@ -65,6 +65,8 @@ function operate(operand1, operator, operand2) {
   return isNumber(result)? round(result, 6) : result;
 }
 
+document.addEventListener("keydown", handleKey);
+
 const historyHTML = document.querySelector(".history");
 const resultHTML = document.querySelector(".result");
 const gridHTML = document.querySelector(".buttons");
@@ -80,6 +82,54 @@ const DIVIDE_ZERO = "NaN: Go back to school";
 const OPERATOR = 1;
 const OPERAND = 2;
 
+function handleKey(e) {
+  console.log(e.key);
+  switch(e.key) {
+    case " ":
+    case "Enter":
+      operation("=");
+      break;
+    case "Backspace":
+    case "Delete":
+      backspace();
+      break;
+    case ".":
+    case "Decimal":
+      handleDecimal();
+      break;
+    case "*":
+    case "Multiply":
+      operation("*");
+      break;
+    case "+":
+    case "Add":
+      operation("+");
+      break;
+    case "/":
+    case "Divide":
+      operation("/");
+      break;
+    case "-":
+    case "Subtract":
+      operation("-");
+      break;
+    case "Escape":
+      clear(true);
+      break;
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      numberPress(e.key);
+      break;
+  }
+}
 
 function handleButtons(e) {
   switch (e.target.id) {
