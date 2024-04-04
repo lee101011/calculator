@@ -15,7 +15,7 @@ const multiply = function (operands) {
 };
 
 const divide = function (operand1, operand2) {
-  if (operand2 === 0) return "NaN: Go back to school";
+  if (operand2 === 0) return DIVIDE_ZERO;
   return operand1 / operand2;
 };
 
@@ -46,10 +46,9 @@ function operate(operand1, operator, operand2) {
     case "-":
       result = subtract(operand1, operand2);
       break;
-    case "x":
-      result = multiply(operand1, operand2);
+    case "*":
+      result = multiply([operand1, operand2]);
       break;
-    case "÷":
     case "/":
       result = divide(operand1, operand2);
       break;
@@ -63,60 +62,27 @@ function operate(operand1, operator, operand2) {
       result = NaN;
       break;
   }
-  return round(result, 6);
+  return isNumber(result)? round(result, 6) : result;
 }
 
-function parseOperations(operator1, operand, operator2, ...rest) {
-  if (rest.length === 0) return operate(operator1, operand, operator2[0]);
-  return parseOperations(operator2[0], operator2[1], operator2.slice(2));
-}
+const historyHTML = document.querySelector(".history");
+const resultHTML = document.querySelector(".result");
+const gridHTML = document.querySelector(".buttons");
+gridHTML.addEventListener("click", handleButtons);
 
-function prepareOperations(array) {
-  let operations = array.slice().reverse();
-  return operations;
-}
+let history = [];
+let result = undefined;
+let storedValue = undefined;
+let storedOperator = undefined;
+let lastType = undefined;
+const DIVIDE_ZERO = "NaN: Go back to school";
 
-let displayValue = "";
-let lastEntry;
-let numberStack = [];
-let operatorStack = [];
 const OPERATOR = 1;
 const OPERAND = 2;
 
-const plus = "element";
-
-let storedValue = undefined;
-let operator = "";
-let displayedValue = 0;
-
-function queueNumber(number) {
-  numberStack.push(number);
-}
-
-function isNumber(value) {
-  return typeof value === "number" && !Number.isNaN(value);
-}
-
-function queueOperator(operator, number) {
-  if(numberStack.length > 0) {
-    let op1 = numberStack.pop();
-    let result = operate(op1, operator, number);
-  }
-  
-
-}
-
-function calculate() {
-}
-
-const history = document.querySelector(".history");
-const result = document.querySelector(".result");
-const grid = document.querySelector(".buttons");
-grid.addEventListener("click", handleButtons);
 
 function handleButtons(e) {
-  console.log(e);
-  switch(e.target.id) {
+  switch (e.target.id) {
     case "one":
     case "two":
     case "three":
@@ -132,17 +98,98 @@ function handleButtons(e) {
     case "decimal":
       handleDecimal();
       break;
+    case "addition":
+      operation("+");
+      break;
+    case "substraction":
+      operation("-");
+      break;
+    case "multiplication":
+      operation("*");
+      break;
+    case "division":
+      operation("/");
+      break;
+    case "backspace":
+      backspace();
+      break;
+    case "clear":
+      clear();
+      break;
+    case "clear-all":
+      clear(true);
+      break;
+    case "equal":
+      operation("=");
+      break;
   }
+}
+
+
+function isNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
+}
+
+function refresh() {
+  resultHTML.textContent = result;
+  historyHTML.textContent = history.join(' ');
 }
 
 function numberPress(string) {
-  history.textContent = history.textContent + string;
-  result.textContent = result.textContent + string;
+  handleNewOperand();
+  resultHTML.textContent = resultHTML.textContent.concat(string);
 }
 
-function handleDecimal(){
-  if(!result.textContent.includes(".")) {
-    result.textContent = result.textContent + ".";
-    history.textContent = history.textContent + ".";
+function getDisplayNumber() {
+  return Number(resultHTML.textContent);
+}
+
+function handleDecimal() {
+  handleNewOperand();
+  if (!resultHTML.textContent.includes(".")) {
+    resultHTML.textContent = resultHTML.textContent.concat(".");
   }
+}
+
+function backspace() {
+  resultHTML.textContent = resultHTML.textContent.substring(0, resultHTML.textContent.length - 1);
+}
+
+function handleNewOperand() {
+  if(result === DIVIDE_ZERO || storedOperator === "=") clear(true);
+  if (lastType === OPERATOR || lastType === undefined) {
+    resultHTML.textContent = "";
+    lastType = OPERAND;
+  }
+}
+
+function clear(all) {
+  if (all) {
+    history.length = 0;
+    storedValue = undefined;
+    storedOperator = undefined;
+  }
+  result = undefined;
+  lastType = undefined;
+  refresh();
+}
+
+function operation(operator) {
+  if(result === DIVIDE_ZERO) clear(true);
+  if (lastType === OPERAND) {
+    let num = getDisplayNumber();
+    history.push(num, operator);
+    if (storedValue && storedOperator !== "=") {
+      storedValue = operate(storedValue, storedOperator, num);
+    } else {
+      storedValue = num;
+    }
+    result = storedValue;
+  } else {
+    history.pop();
+    history.push(operator);
+  }
+  lastType = OPERATOR;
+  storedOperator = operator;
+  refresh();
 }
