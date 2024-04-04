@@ -62,7 +62,7 @@ function operate(operand1, operator, operand2) {
       result = NaN;
       break;
   }
-  return isNumber(result)? round(result, 6) : result;
+  return isNumber(result) ? round(result, 6) : result;
 }
 
 document.addEventListener("keydown", handleKey);
@@ -84,7 +84,7 @@ const OPERAND = 2;
 
 function handleKey(e) {
   console.log(e.key);
-  switch(e.key) {
+  switch (e.key) {
     case " ":
     case "Enter":
       operation("=");
@@ -206,7 +206,7 @@ function backspace() {
 }
 
 function handleNewOperand() {
-  if(result === DIVIDE_ZERO || storedOperator === "=") clear(true);
+  if (result === DIVIDE_ZERO || storedOperator === "=") clear(true);
   if (lastType === OPERATOR || lastType === undefined) {
     resultHTML.textContent = "";
     lastType = OPERAND;
@@ -225,7 +225,7 @@ function clear(all) {
 }
 
 function operation(operator) {
-  if(result === DIVIDE_ZERO) clear(true);
+  if (result === DIVIDE_ZERO) clear(true);
   if (lastType === OPERAND) {
     let num = getDisplayNumber();
     history.push(num, operator);
@@ -235,11 +235,12 @@ function operation(operator) {
       storedValue = num;
     }
     result = storedValue;
-  } else {
+    storedOperator = operator;
+  } else if (storedValue) {
     history.pop();
     history.push(operator);
+    storedOperator = operator;
   }
   lastType = OPERATOR;
-  storedOperator = operator;
   refresh();
 }
